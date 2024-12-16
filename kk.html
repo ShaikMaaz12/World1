@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love Animation</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #a8edea, #fed6e3);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 300px;
+        }
+
+        .container h1 {
+            color: #6c5ce7;
+        }
+
+        .input-group {
+            margin: 15px 0;
+        }
+
+        .input-group input {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        .input-group input:focus {
+            border-color: #6c5ce7;
+        }
+
+        button {
+            background: #6c5ce7;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #4834d4;
+        }
+
+        canvas {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to Saba</h1>
+        <form id="loginForm">
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Enter Username" required>
+            </div>
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Enter Password" required>
+            </div>
+            <button type="submit">Submit</button>
+        </form>
+        <canvas id="threeCanvas"></canvas>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        const form = document.getElementById('loginForm');
+        const canvas = document.getElementById('threeCanvas');
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            form.style.display = 'none';
+            canvas.style.display = 'block';
+            startLoveAnimation();
+        });
+
+        function startLoveAnimation() {
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+
+            const light = new THREE.PointLight(0xffffff, 1);
+            light.position.set(10, 10, 10);
+            scene.add(light);
+
+            const ambientLight = new THREE.AmbientLight(0x404040);
+            scene.add(ambientLight);
+
+            // Create hearts
+            const heartGeometry = new THREE.ShapeGeometry(new THREE.Shape().moveTo(0, 0).bezierCurveTo(0, 1, 1, 1, 1, 0).bezierCurveTo(1, -1, 0, -1, 0, 0));
+            const heartMaterial = new THREE.MeshStandardMaterial({ color: 0xff0000 });
+            const heart1 = new THREE.Mesh(heartGeometry, heartMaterial);
+            heart1.scale.set(0.5, 0.5, 1);
+            heart1.position.set(-2, 0, 0);
+            scene.add(heart1);
+
+            const heart2 = new THREE.Mesh(heartGeometry, heartMaterial);
+            heart2.scale.set(0.5, 0.5, 1);
+            heart2.position.set(2, 0, 0);
+            scene.add(heart2);
+
+            // Create figures (friends)
+            const bodyGeometry = new THREE.CylinderGeometry(0.2, 0.2, 2, 32);
+            const bodyMaterial = new THREE.MeshStandardMaterial({ color: 0x87ceeb });
+            const body1 = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body1.position.set(-2, 1, 0);
+            scene.add(body1);
+
+            const body2 = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body2.position.set(2, 1, 0);
+            scene.add(body2);
+
+            // Add simple heads (spheres)
+            const headGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+            const headMaterial = new THREE.MeshStandardMaterial({ color: 0xffc1cc });
+            const head1 = new THREE.Mesh(headGeometry, headMaterial);
+            head1.position.set(-2, 2.5, 0);
+            scene.add(head1);
+
+            const head2 = new THREE.Mesh(headGeometry, headMaterial);
+            head2.position.set(2, 2.5, 0);
+            scene.add(head2);
+
+            camera.position.z = 8;
+
+            let angle = 0;
+
+            function animate() {
+                requestAnimationFrame(animate);
+
+                // Move hearts towards each other
+                heart1.position.x += 0.02;
+                heart2.position.x -= 0.02;
+
+                // Move figures towards each other
+                body1.position.x += 0.01;
+                body2.position.x -= 0.01;
+                head1.position.x += 0.01;
+                head2.position.x -= 0.01;
+
+                if (body1.position.x >= 0) {
+                    body1.position.x = 0;
+                    body2.position.x = 0;
+                    head1.position.x = 0;
+                    head2.position.x = 0;
+                }
+
+                renderer.render(scene, camera);
+            }
+
+            animate();
+        }
+    </script>
+</body>
+</html>
